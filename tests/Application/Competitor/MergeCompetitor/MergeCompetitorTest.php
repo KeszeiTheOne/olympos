@@ -10,17 +10,25 @@
  * Time: 18:23
  */
 
-namespace Tests\Application\Competitor\AddCompetitor;
+namespace Tests\Application\Competitor\MergeCompetitor;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Utils\Actions\Action;
 use Utils\Actions\Request;
 use Utils\Actions\Responder;
 use Utils\Exceptions\UnexpectedType;
+use Utils\Fixtures\Gateway\UpdaterGatewaySpy;
 use Utils\Fixtures\RequestDummy;
+use Utils\Gateway\UpdaterGateway;
 
-class AddCompetitorTest extends TestCase {
+class MergeCompetitorTest extends TestCase {
+	
+	/**
+	 * @var UpdaterGateway
+	 */
+	private $competitorGateway;
 	
 	/**
 	 * @test
@@ -29,10 +37,34 @@ class AddCompetitorTest extends TestCase {
 		$this->assertRunThrows(new RequestDummy(), UnexpectedType::class);
 	}
 	
+	/**
+	 * @test
+	 */
+	public function givenMissingName_whenRun_thenThrowsInvalidRequest() {
+		$this->assertRunThrows(new AddCompetitorRequest(), InvalidRequest::class);
+	}
+	
+	/**
+	 * @test
+	 */
+	public function givenUnknownCompetitor_whenRun_thenThrowsUnexpectedType() {
+	
+	}
+	
+	protected function setUp() {
+		parent::setUp();
+		
+		$this->setExistingCompetitor("asd");
+	}
+	
+	private function setExistingCompetitor($model) {
+		$this->competitorGateway = new UpdaterGatewaySpy($model);
+	}
+	
 	private function assertRunThrows($request, $expectedException) {
 		try {
 			$this->runAction($request);
-		} catch (Exception $exc) {
+		}catch (Exception $exc) {
 			$this->assertInstanceOf($expectedException, $exc, $exc->getMessage());
 			
 			return $exc;
@@ -45,6 +77,13 @@ class AddCompetitorTest extends TestCase {
 		$action = new AddCompetitor(new Responder());
 		
 		$action->run($request);
+	}
+	
+	private function request() {
+		$request = new AddCompetitorRequest();
+		$request->name = "name";
+		
+		return $request;
 	}
 	
 }
@@ -70,12 +109,25 @@ abstract class AbstractAction implements Action {
 class AddCompetitor extends AbstractAction {
 	
 	public function run(Request $request) {
-		if ( !$request instanceof AddCompetitorRequest ) {
+		if (!$request instanceof AddCompetitorRequest) {
 			throw new UnexpectedType();
+		}
+		
+		if (!$request->isValid()) {
+			throw new InvalidRequest();
 		}
 	}
 }
 
 class AddCompetitorRequest implements Request {
+	
+	public $name;
+	
+	public function isValid() {
+		return null !== $this->name;
+	}
+}
+
+class InvalidRequest extends RuntimeException {
 
 }
