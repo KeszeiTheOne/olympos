@@ -12,15 +12,17 @@
 
 namespace Application;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Utils\Actions\ActionRegistryBuilder;
 use Utils\Actions\ActionType;
 
 class ApplicationActionType implements ActionType {
 	
-	public function buildRegistry($builder, array $options) {
-	
+	public function buildRegistry(ActionRegistryBuilder $builder, array $options) {
+		// TODO: Implement buildRegistry() method.
 	}
 	
-	public function configureOptions($resolver) {
-		
+	public function configureOptions(OptionsResolver $resolver) {
+		// TODO: Implement configureOptions() method.
 	}
 }

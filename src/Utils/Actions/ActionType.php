@@ -12,9 +12,11 @@
 
 namespace Utils\Actions;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 interface ActionType {
 	
-	public function buildRegistry($builder, array $options);
+	public function buildRegistry(ActionRegistryBuilder $builder, array $options);
 	
-	public function configureOptions($resolver);
+	public function configureOptions(OptionsResolver $resolver);
 }
